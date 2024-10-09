@@ -2,7 +2,6 @@
 CREATE DATABASE sql_project_p1;
 
 -- Create TABLE
-DROP TABLE IF EXISTS retail_sales;
 CREATE TABLE retail_sales
             (
                 transactions_id INT PRIMARY KEY,
@@ -17,12 +16,6 @@ CREATE TABLE retail_sales
                 cogs FLOAT,
                 total_sale FLOAT
             );
-
-SELECT * 
-FROM retail_sales;
-
-SELECT COUNT(*)
-FROM retail_sales;
 
 -- Data Cleaning
 SELECT * 
@@ -75,27 +68,23 @@ WHERE
  total_sale IS NULL;
 
 -- DATA EXPLORATION
--- What is the total number of sales?
+-- Record Count
 SELECT COUNT(*) AS total_sale
 FROM retail_sales;
 
--- What are total number of unique customers?
+-- Unique customer count
 SELECT COUNT(DISTINCT(customer_id)) 
 FROM retail_sales;
 
--- What are the distinct product categories?
+-- Distinct product category count
 SELECT DISTINCT category 
 FROM retail_sales;
 
 -- Data Analysis
--- SALES PERFORMANCE
--- What is the total sales amount for each day?
-SELECT sale_date, SUM(total_sale) as total_sales
-FROM retail_sales
-GROUP BY sale_date
-ORDER BY sale_date;
 
---What is the total sales (total_sale) for each category.
+-- SALES PERFORMANCE
+
+--What is the total sales (total_sale) for each category?
 SELECT category, SUM(total_sale) AS total_sale, COUNT(*) AS total_orders
 FROM retail_sales 
 GROUP BY category;
@@ -138,10 +127,10 @@ LIMIT 5;
 
 -- PRODUCT PERFORMANCE 
 -- Which product category has the highest quantity sold?
-SELECT category, SUM(total_sale) AS total_quantity
+SELECT category, COUNT(quantity), SUM(total_sale) AS total_quantity_sold
 FROM retail_sales
 GROUP BY category
-ORDER BY total_quantity DESC
+ORDER BY COUNT(quantity) DESC
 LIMIT 1;
 
 -- What is the average price per unit for each product category?
@@ -157,17 +146,6 @@ ORDER BY total_cogs DESC
 LIMIT 1;
 
 -- TIME-BASED ANALYSIS
--- At what time of day are sales the highest?
-SELECT sale_time, SUM(total_sale) AS total_sale
-FROM retail_sales
-GROUP BY sale_time
-ORDER BY total_sale DESC;
-
--- What is the hourly distribution of sales across the day?
-SELECT EXTRACT(HOUR FROM sale_time) AS hour, SUM(total_sale) AS total_sales
-FROM retail_sales
-GROUP BY EXTRACT(HOUR FROM sale_time)
-ORDER BY hour;
 
 -- What is the average sales for each month and which is the highest selling month in each year?
 SELECT year, month, avg_sale
@@ -199,11 +177,11 @@ FROM hourly_sale
 GROUP BY shift;
 
 -- PROFIT ANALYSIS
--- Which transaction had the highest profit (total_sale - cogs)?
-SELECT transactions_id, (total_sale - cogs) AS profit
+-- What is the profit made by each category and which category made the highest profit (total_sale - cogs)?
+SELECT category, SUM(total_sale - cogs) AS total_profit
 FROM retail_sales
-ORDER BY profit DESC
-LIMIT 1;
+GROUP BY category
+ORDER BY total_profit DESC;
 
 -- What is the average profit margin for each product category?
 SELECT category, AVG(total_sale - cogs) AS profit_margin
@@ -211,23 +189,6 @@ FROM retail_sales
 GROUP BY category
 ORDER BY profit_margin DESC;
 
--- What is the total profit for each category?
-SELECT category, SUM(total_sale - cogs) AS total_profit
-FROM retail_sales
-GROUP BY category
-ORDER BY total_profit DESC;
-
--- CUSTOMER RETENTION AND LOYALTY
--- How many unique customers made purchases?
-SELECT COUNT(DISTINCT(customer_id))AS unique_customers
-FROM retail_sales;
-
--- Which customer has made the most purchases (by transaction count)?
-SELECT customer_id, COUNT(transactions_id) AS num_transactions
-FROM retail_sales
-GROUP BY customer_id
-ORDER BY num_transactions DESC
-LIMIT 1;
 
 --END OF PROJECT
 
